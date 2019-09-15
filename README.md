@@ -1,4 +1,6 @@
 *RUNNING THE EXECUTABLE*
+
+Running the executable will generate a file `output.txt` in the project's root.
 - Open a terminal window
 - Navigate to the folder where you cloned pancakeRevenge
 - Redirect the input file into the program for your platform: 
