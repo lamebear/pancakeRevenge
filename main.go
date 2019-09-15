@@ -18,6 +18,18 @@ type Order struct {
 
 func main() {
 	currCase := 1
+	fOutput, err := os.Create("output.txt")
+
+	if err != nil {
+		log.Panicln("error creating file output.txt")
+	}
+
+	defer func() {
+		if err := fOutput.Close(); err != nil {
+			log.Panicln("error attempting to close file because: " + err.Error())
+		}
+	}()
+
 	scanner := bufio.NewScanner(os.Stdin)
 
 	// skip first line: using scanner, so dont need to know how many lines to iterate over
@@ -26,7 +38,7 @@ func main() {
 	for scanner.Scan() {
 		currPancakes := scanner.Text()
 
-		if err := displayNumberOfFlips(currCase, currPancakes); err != nil {
+		if err := displayNumberOfFlips(currCase, currPancakes, fOutput); err != nil {
 			log.Println(err.Error())
 		}
 
@@ -46,11 +58,19 @@ func areValidPancakes(pancakes string) bool {
 }
 
 // displayNumberOfFlips prints the number of minimum flips to get the pancake stack facing happy-side up.
-func displayNumberOfFlips(currCase int, pancakes string) error {
+func displayNumberOfFlips(currCase int, pancakes string, file *os.File) error {
 	if areValidPancakes(pancakes) {
 		o := processOrder(pancakes)
 
-		fmt.Printf("Case #%d: %d\n", currCase, o.NumFlips)
+		output := fmt.Sprintf("Case #%d: %d\n", currCase, o.NumFlips)
+
+		if _, err := file.WriteString(output); err != nil {
+			return err
+		}
+
+		if err := file.Sync(); err != nil {
+			return err
+		}
 	} else {
 		msg := fmt.Sprintf("skipping case %d due to character other than - or + detected", currCase)
 
